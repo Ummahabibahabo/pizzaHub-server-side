@@ -4,7 +4,7 @@ import cors from "cors";
 import { MongoClient } from "mongodb";
 
 const app = express();
-const port = process.env.PORT || 500;
+const port = process.env.PORT || 5000;
 // middleware
 
 app.use(cors());
@@ -15,7 +15,6 @@ const client = new MongoClient(process.env.MONGO_DB_URL);
 export async function connectToMongoDB() {
   try {
     await client.connect();
-    const database = client.db("pizzaHub_db");
 
     console.log("You successfully connected to MongoDB!");
     return client;
@@ -23,9 +22,24 @@ export async function connectToMongoDB() {
     console.dir(err);
   }
 }
-
+const database = client.db("pizzaHub_db");
+const usersCollection = database.collection("user");
+const menuCollection = database.collection("menuItems");
 app.get("/", (req, res) => {
   res.send("Hello World!");
+
+  // user-get
+  app.get("/users", async (req, res) => {
+    const cursor = usersCollection.find();
+    const result = await cursor.toArray();
+    res.send(result);
+  });
+  // menu-post
+  app.post("/add-menu", async (req, res) => {
+    const menu = req.body;
+    const result = await menuCollection.insertOne(menu);
+    res.send(result);
+  });
 });
 connectToMongoDB();
 app.listen(port, () => {
