@@ -45,6 +45,18 @@ app.post("/add-menu", async (req, res) => {
   const result = await menuCollection.insertOne(menuData);
   res.send(result);
 });
+// add-menu-get
+app.get("/add-menus", async (req, res) => {
+  const cursor = menuCollection.find();
+  const result = await cursor.toArray();
+  res.send(result);
+});
+// add-menu-item by email
+app.get("/add-menu-by-email/:email", async (req, res) => {
+  const { email } = req.params;
+  const result = await menuCollection.find({ vendorEmail: email }).toArray();
+  res.send(result);
+});
 connectToMongoDB();
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
